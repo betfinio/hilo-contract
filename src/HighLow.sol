@@ -11,7 +11,7 @@ import "./shared/games/GameInterface.sol";
 import "./shared/CoreInterface.sol";
 import "./shared/staking/StakingInterface.sol";
 
-import "./DiceBet.sol";
+import "./HighLowBet.sol";
 
 /**
  * Errors used in this contract

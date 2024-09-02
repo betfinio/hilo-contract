@@ -6,8 +6,8 @@ import "forge-std/Test.sol";
 import "../src/shared/Token.sol";
 import "../src/shared/Core.sol";
 import "../src/shared/staking/StakingInterface.sol";
-import "../src/Dice.sol";
-import "../src/DiceBet.sol";
+import "../src/HighLow.sol";
+import "../src/HighLowBet.sol";
 
 contract DiceTest is Test {
     Token public token;
