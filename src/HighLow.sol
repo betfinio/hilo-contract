@@ -3,7 +3,6 @@ pragma solidity 0.8.19;
 
 import "chainlink/vrf/dev/VRFCoordinatorV2_5.sol";
 import "chainlink/vrf/dev/VRFConsumerBaseV2Plus.sol";
-import "openzeppelin/access/AccessControl.sol";
 import "openzeppelin/security/ReentrancyGuard.sol";
 import "openzeppelin/token/ERC20/IERC20.sol";
 import "openzeppelin/token/ERC20/utils/SafeERC20.sol";
@@ -23,17 +22,11 @@ import "./HighLowBet.sol";
  * D05 - only core can place bets
  * D06 - invalid coordinator            //no needed
  * D07 - staking pool balance insufficient
+ * D08 - min BET amount is required
  */
 
-contract Dice is
-    VRFConsumerBaseV2Plus,
-    AccessControl,
-    GameInterface,
-    ReentrancyGuard
-{
+contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     using SafeERC20 for IERC20;
-
-    bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
 
     uint256 public constant REQUIRED_FUNDS_COEFFICIENT = 20;
     uint256 private immutable created;
@@ -43,6 +36,8 @@ contract Dice is
     uint32 private constant callbackGasLimit = 2_500_000;
     uint16 public constant requestConfirmations = 3;
     uint32 private constant numWords = 1;
+
+    uint256 public constant MIN_BET = 3000 ether;
 
     StakingInterface public staking;
     CoreInterface public core;
@@ -80,16 +75,6 @@ contract Dice is
         require(core.isStaking(_staking), "D01");
         staking = StakingInterface(_staking);
         created = block.timestamp;
-        _grantRole(DEFAULT_ADMIN_ROLE, _admin);
-    }
-
-    /* For Test Purpose - will be removed when deployment */
-    // Public function to test fulfillRandomWords
-    function FulfillRandomWords(
-        uint256 requestId,
-        uint256[] calldata randomWords
-    ) public {
-        fulfillRandomWords(requestId, randomWords);
     }
 
     function getVrfCoordinator() public view returns (address) {
@@ -182,6 +167,8 @@ contract Dice is
         require(player == _player, "D02");
         //revert if amount is not whole
         require(amount * 10 ** 18 == _amount, "D03");
+
+        require(amount >= MIN_BET, "D08");
 
         return address(roll(_player, _amount, _threshold, _side));
     }
