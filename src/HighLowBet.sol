@@ -5,9 +5,9 @@ import "openzeppelin/access/Ownable.sol";
 import "./shared/BetInterface.sol";
 
 contract DiceBet is Ownable, BetInterface {
-    address private player;
-    address private game;
-    uint256 private amount;
+    address private immutable player;
+    address private immutable game;
+    uint256 private immutable amount;
     uint256 private threshold;
     bool private side;
     uint256 private immutable created;
