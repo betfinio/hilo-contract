@@ -69,7 +69,6 @@ contract DiceTest is Test {
         dice = new Dice(
             address(core),
             address(staking),
-            address(this),
             555,
             0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed,
             0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f
@@ -116,7 +115,6 @@ contract DiceTest is Test {
         Dice _dice = new Dice(
             address(core),
             address(staking),
-            address(this),
             555,
             0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed,
             0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f

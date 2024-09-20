@@ -63,7 +63,6 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     constructor(
         address _core,
         address _staking,
-        address _admin,
         uint256 _subscriptionId,
         address _vrfCoordinator,
         bytes32 _keyHash
@@ -183,7 +182,7 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     ) internal override {
         uint256 random = randomWords[0];
         //get random number between 0 and 10000
-        uint256 value = (random % 9999) + 1;
+        uint256 value = (random % 10000) + 1;
         DiceBet bet = requestBets[requestId];
         address player = bet.getPlayer();
         (uint256 threshold, bool side) = bet.getBets();
