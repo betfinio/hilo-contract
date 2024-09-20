@@ -76,7 +76,6 @@ contract DiceTest is Test {
         );
         core.addGame(address(dice));
         betsMemory.addAggregator(address(core));
-        dice.grantRole(dice.TIMELOCK(), address(this));
         address tariff = core.addTariff(0, 1_00, 0);
         vm.startPrank(carol);
         partner = Partner(core.addPartner(tariff));
@@ -156,8 +155,8 @@ contract DiceTest is Test {
         vm.expectRevert(bytes("D04"));
         partner.placeBet(
             address(dice),
-            100 ether,
-            abi.encode(alice, 100, 0, 1)
+            1000 ether,
+            abi.encode(alice, 1000, 0, 1)
         );
 
         vm.expectRevert(bytes("D04"));
@@ -174,28 +173,29 @@ contract DiceTest is Test {
         vm.assume(_threshold > 0 && _threshold < 10000);
         // uint256 amount = 100;
         getRequest(5);
-        token.transfer(address(dice), 100 * 10000 ether);
-        token.transfer(address(staking), 100 * 10000 ether);
-        token.transfer(address(core), 100 * 10000 ether);
+        token.transfer(address(dice), 1000 * 10000 ether);
+        token.transfer(address(staking), 1000 * 10000 ether);
+        token.transfer(address(core), 1000 * 10000 ether);
 
         vm.startPrank(alice);
-        token.approve(address(core), 100 * 1 ether);
+        token.approve(address(core), 1000 * 1 ether);
 
         uint256 playBalance = token.balanceOf(alice);
 
         address bet = partner.placeBet(
             address(dice),
-            100 * 1 ether,
-            abi.encode(alice, 100, _threshold, 1)
+            1000 * 1 ether,
+            abi.encode(alice, 1000, _threshold, 1)
         );
 
         DiceBet diceBet = DiceBet(bet);
         uint256[] memory words = new uint256[](3);
-        uint256 profit = dice.getPossibleWin(_threshold, true, 100 * 1 ether);
+        uint256 profit = dice.getPossibleWin(_threshold, true, 1000 * 1 ether);
         uint256 stakingBalance = token.balanceOf(staking);
 
         words[0] = 256;
-        dice.FulfillRandomWords(5, words);
+        vm.startPrank(dice.vrfCoordinator());
+        dice.rawFulfillRandomWords(5, words);
 
         assertEq(diceBet.getResult(), 257 > _threshold ? profit : 0 ether);
         assertEq(diceBet.getStatus(), 2);
@@ -213,12 +213,12 @@ contract DiceTest is Test {
         ) = diceBet.getBetInfo();
         assertEq(__player, alice);
         assertEq(__game, address(dice));
-        assertEq(__amount, 100 * 1 ether);
+        assertEq(__amount, 1000 * 1 ether);
         assertEq(__result, 257 > _threshold ? profit : 0 ether);
         assertEq(__status, 2);
         assertEq(__created, block.timestamp);
 
-        assertEq(token.balanceOf(address(dice)), 100 * 10000 ether - profit);
+        assertEq(token.balanceOf(address(dice)), 1000 * 10000 ether - profit);
         assertEq(token.balanceOf(alice), playBalance - __amount + __result);
         assertEq(
             token.balanceOf(staking),

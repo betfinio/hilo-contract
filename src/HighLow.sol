@@ -23,6 +23,7 @@ import "./HighLowBet.sol";
  * D06 - invalid coordinator            //no needed
  * D07 - staking pool balance insufficient
  * D08 - min BET amount is required
+ * D09 - transfer failed
  */
 
 contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
@@ -37,7 +38,7 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     uint16 public constant requestConfirmations = 3;
     uint32 private constant numWords = 1;
 
-    uint256 public constant MIN_BET = 3000 ether;
+    uint256 public constant MIN_BET = 1000 ether;
 
     StakingInterface public staking;
     CoreInterface public core;
@@ -139,7 +140,10 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         bet.setBets(threshold, side);
         requestBets[requestId] = bet;
         //transfer betted money into staking
-        IERC20(staking.getToken()).transfer(address(staking), amount);
+        require(
+            IERC20(staking.getToken()).transfer(address(staking), amount),
+            "D09"
+        );
         playerRequests[player].push(requestId);
         emit Rolled(address(bet), requestId, player);
         // calculate max possible win
@@ -160,15 +164,15 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         uint256 _amount,
         bytes calldata _data
     ) external override returns (address betAddress) {
-        require(address(core) == _msgSender(), "D05");
+        require(address(core) == msg.sender, "D05");
         (address player, uint256 amount, uint256 _threshold, bool _side) = abi
             .decode(_data, (address, uint256, uint256, bool));
         //revert if player is not the same
         require(player == _player, "D02");
         //revert if amount is not whole
-        require(amount * 10 ** 18 == _amount, "D03");
+        require(amount * 1 ether == _amount, "D03");
 
-        require(amount >= MIN_BET, "D08");
+        require(_amount >= MIN_BET, "D08");
 
         return address(roll(_player, _amount, _threshold, _side));
     }
@@ -194,12 +198,15 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         bet.setResult(amount);
         if (amount > 0) {
             // send win amount to player
-            IERC20(core.token()).transfer(player, amount);
+            require(IERC20(core.token()).transfer(player, amount), "D09");
         }
         // send leftovers back to staking contract - this will be 0 in dice game
-        IERC20(core.token()).transfer(
-            address(staking),
-            reservedFunds[requestId] - amount
+        require(
+            IERC20(core.token()).transfer(
+                address(staking),
+                reservedFunds[requestId] - amount
+            ),
+            "D09"
         );
         // clear reserved funds for current request
         reservedFunds[requestId] = 0;
