@@ -38,6 +38,9 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     uint16 public constant requestConfirmations = 3;
     uint32 private constant numWords = 1;
 
+    uint256 public MIN_THRESHOLD = 100;
+    uint256 public MAX_THRESHOLD = 9900;
+
     uint256 public constant MIN_BET = 1000 ether;
 
     StakingInterface public staking;
@@ -99,8 +102,11 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         uint256 _threshold,
         bool _side,
         uint256 _amount
-    ) public pure returns (uint256) {
-        require(_threshold > 0 && _threshold < 10000, "D04");
+    ) public view returns (uint256) {
+        require(
+            _threshold >= MIN_THRESHOLD && _threshold <= MAX_THRESHOLD,
+            "D04"
+        );
 
         // Calculate mulplier according to the success percentage
         if (!_side) {
@@ -118,7 +124,7 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         bool side
     ) internal nonReentrant returns (address) {
         // validate threshold
-        require(threshold < 10000 && threshold > 0, "D04");
+        require(threshold <= MAX_THRESHOLD && threshold >= MIN_THRESHOLD, "D04");
         // request random number
         uint256 requestId = VRFCoordinatorV2_5(vrfCoordinator)
             .requestRandomWords(

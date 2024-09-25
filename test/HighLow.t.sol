@@ -168,7 +168,7 @@ contract DiceTest is Test {
     }
 
     function testFuzz_fulFillRound(uint256 _threshold) public {
-        vm.assume(_threshold > 0 && _threshold < 10000);
+        vm.assume(_threshold > 100 && _threshold < 9900);
         // uint256 amount = 100;
         getRequest(5);
         token.transfer(address(dice), 1000 * 10000 ether);
