@@ -35,7 +35,7 @@ contract HighLow is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     address public immutable vrfCoordinator;
     bytes32 public immutable keyHash;
     uint32 private constant callbackGasLimit = 2_500_000;
-    uint16 public constant requestConfirmations = 3;
+    uint16 public constant requestConfirmations = 6;
     uint32 private constant numWords = 1;
 
     uint256 public constant MIN_THRESHOLD = 100;
