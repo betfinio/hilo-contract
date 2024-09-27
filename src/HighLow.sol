@@ -26,7 +26,7 @@ import "./HighLowBet.sol";
  * D09 - transfer failed
  */
 
-contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
+contract HighLow is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     uint256 public constant REQUIRED_FUNDS_COEFFICIENT = 20;
@@ -38,8 +38,8 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
     uint16 public constant requestConfirmations = 3;
     uint32 private constant numWords = 1;
 
-    uint256 public MIN_THRESHOLD = 100;
-    uint256 public MAX_THRESHOLD = 9900;
+    uint256 public constant MIN_THRESHOLD = 100;
+    uint256 public constant MAX_THRESHOLD = 9900;
 
     uint256 public constant MIN_BET = 1000 ether;
 
@@ -92,7 +92,7 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
 
     /* Test Purpose Functions definition Finish */
 
-    // Get possible win amount. In Dice game, this will be same as the win amount.
+    // Get possible win amount. In HighLow game, this will be same as the win amount.
     // This will return the winner's prize amount according to _threshold and _side
     // _side = 1 -> win when the random number is bigger than _threshold
     // _side = 0 -> win when the random number is less than _threshold
@@ -124,7 +124,10 @@ contract Dice is VRFConsumerBaseV2Plus, GameInterface, ReentrancyGuard {
         bool side
     ) internal nonReentrant returns (address) {
         // validate threshold
-        require(threshold <= MAX_THRESHOLD && threshold >= MIN_THRESHOLD, "D04");
+        require(
+            threshold <= MAX_THRESHOLD && threshold >= MIN_THRESHOLD,
+            "D04"
+        );
         // request random number
         uint256 requestId = VRFCoordinatorV2_5(vrfCoordinator)
             .requestRandomWords(

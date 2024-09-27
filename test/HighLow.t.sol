@@ -13,7 +13,7 @@ contract DiceTest is Test {
     Token public token;
     address public staking = address(999000999000);
     Core public core;
-    Dice public dice;
+    HighLow public dice;
     Partner public partner;
     BetsMemory public betsMemory;
     Pass public pass;
@@ -66,7 +66,7 @@ contract DiceTest is Test {
             abi.encode(address(token))
         );
         core.addStaking(address(staking));
-        dice = new Dice(
+        dice = new HighLow(
             address(core),
             address(staking),
             555,
@@ -112,7 +112,7 @@ contract DiceTest is Test {
     }
 
     function testConstructor() public {
-        Dice _dice = new Dice(
+        HighLow _dice = new HighLow(
             address(core),
             address(staking),
             555,
