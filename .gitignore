@@ -5,3 +5,6 @@ script/
 .env*
 
 .vscode/
+
+
+scripts/
